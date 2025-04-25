@@ -1,5 +1,7 @@
 package com.desi.kart.desikart_backend.domain;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 
 import jakarta.persistence.Entity;
@@ -16,5 +18,5 @@ public class UserRole {
 	
 	private String userId;
 	
-	private String roleId;
+	private List<String> roleId;
 }
