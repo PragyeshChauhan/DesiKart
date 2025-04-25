@@ -2,7 +2,8 @@ package com.desi.kart.desikart_backend.serviceimpl;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.desi.kart.desikart_backend.domain.OtpVerification;
@@ -26,13 +27,16 @@ public class UserServiceImpl implements UserService{
 	private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final EntityManager entityManager;
+
     private NotificationService pushService;
     private OtpRepository otpRepo;
+	private Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     
     public UserServiceImpl(UserMapper userMapper, UserRepository userRepository,EntityManager entityManager,OtpRepository otpRepo,NotificationService pushService) {
         this.userMapper = userMapper;
         this.userRepository = userRepository;
         this.entityManager = entityManager;
+		this.pushService =pushService;
         this.otpRepo = otpRepo;
     }
 
@@ -45,8 +49,13 @@ public class UserServiceImpl implements UserService{
 		String otp = Utility.generateOtp();
 	    OtpVerification otpVerification = new OtpVerification(user.getId(), otp, LocalDateTime.now(), false);
 	    otpRepo.save(otpVerification);
-        pushService.sendOtp(user.getDeviceToken(), otp);
-		user = userRepository.save(user);
+
+        try {
+            pushService.sendOtp(user.getDeviceToken(), otp);
+        } catch (Exception e) {
+			log.info("error whiling otp verification");
+        }
+        user = userRepository.save(user);
 		return userMapper.toDTO(user);
 	}
 

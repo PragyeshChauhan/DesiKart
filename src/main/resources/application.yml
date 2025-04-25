@@ -1,0 +1,16 @@
+# src/main/resources/application.yml
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}  # Default to 'dev' if no profile is provided
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    protocol: smtp
+    smtp:
+      auth: true
+      starttls:
+        enable: true
+    default-encoding: UTF-8

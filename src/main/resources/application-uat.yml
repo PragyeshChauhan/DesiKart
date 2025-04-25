@@ -1,0 +1,13 @@
+# src/main/resources/application-uat.yml
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${UAT_MAIL_USERNAME}
+    password: ${UAT_MAIL_PASSWORD}
+    protocol: smtp
+    smtp:
+      auth: true
+      starttls:
+        enable: true
+    default-encoding: UTF-8
