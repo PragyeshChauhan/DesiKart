@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class UserDTO {
 
-    private String id;
+    private Long id;
 	
 	private String name;
 	
@@ -18,4 +18,9 @@ public class UserDTO {
 	private boolean isVerified;
 	
 	private boolean isActive;
+
+	private String password;
+
+	private String deviceToken;
+
 }

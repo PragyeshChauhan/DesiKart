@@ -1,6 +1,40 @@
 package com.desi.kart.desikart_backend.notification;
 
+import jakarta.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import jakarta.mail.internet.MimeMessage;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+
+@Service
 public class MailService {
 
+    @Autowired
+    private JavaMailSender mailSender;
 
+    @Autowired
+    private SpringTemplateEngine templateEngine;
+
+    public void sendResetPasswordEmail(String toEmail, String resetLink) {
+        Context context = new Context();
+        context.setVariable("resetLink", resetLink);
+        String htmlContent = templateEngine.process("email-reset-password", context);
+        MimeMessage message = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
+            helper.setTo(toEmail);
+            helper.setSubject("Reset Your Password");
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error sending email", e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error processing the email", e);
+        }
+    }
 }

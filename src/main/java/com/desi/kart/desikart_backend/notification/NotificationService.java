@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
+
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
@@ -21,17 +23,18 @@ public class NotificationService {
 	@PostConstruct
 	public void init() throws IOException {
 		try {
-			InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("firebase-service-account.json");
+			FileInputStream serviceAccount = new FileInputStream("src/main/resources/desikart-de70f-firebase-adminsdk.json");
+			System.out.println(serviceAccount != null ? "Loaded OK" : "File not found!");
 			if (serviceAccount == null) {
 				throw new IOException("Firebase service account file not found");
 			}
-//			FirebaseOptions options = FirebaseOptions.builder()
-//					.setCredentials(GoogleCredentials.fromStream(serviceAccount))
-//					.build();
-//			if (FirebaseApp.getApps().isEmpty()) {
-//				FirebaseApp.initializeApp(options);
-//				log.info("FirebaseApp initialized successfully");
-//			}
+			FirebaseOptions options = FirebaseOptions.builder()
+					.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+					.build();
+			if (FirebaseApp.getApps().isEmpty()) {
+				FirebaseApp.initializeApp(options);
+				log.info("FirebaseApp initialized successfully");
+			}
 		} catch (IOException e) {
 			log.error("Failed to initialize Firebase: {}", e.getMessage(), e);
 			throw e;

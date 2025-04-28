@@ -1,26 +1,25 @@
 package com.desi.kart.desikart_backend.resource;
 
+import com.desi.kart.desikart_backend.notification.MailService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.desi.kart.desikart_backend.dto.UserDTO;
 import com.desi.kart.desikart_backend.serviceimpl.UserServiceImpl;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/user")
 public class UserResource {
 	
 	private final UserServiceImpl userServiceImpl;
+	private final MailService mailService;
 		
-	public UserResource(UserServiceImpl userServiceImpl) {
+	public UserResource(UserServiceImpl userServiceImpl,MailService mailService) {
+		this.mailService = mailService;
 		this.userServiceImpl = userServiceImpl;
 	}
 
@@ -42,5 +41,40 @@ public class UserResource {
 	@PatchMapping
 	public ResponseEntity<?> updateUserStatus(@RequestBody String id){
 		return new ResponseEntity<>(userServiceImpl.updateStatus(id), HttpStatus.OK);
+	}
+
+	@PostMapping("/forgot-password-email")
+	public ResponseEntity<?> sendResetEmail(@RequestParam String email) {
+		String token = UUID.randomUUID().toString();
+		userServiceImpl.saveResetToken(email,token);
+		String resetLink = "https://desikart.com/reset-password?token=" + token;
+		mailService.sendResetPasswordEmail(email, resetLink);
+		return ResponseEntity.ok("Reset email sent");
+	}
+
+	@PostMapping("/reset-password")
+	public ResponseEntity<?> resetPassword(HttpServletRequest httpServletRequest) {
+		try {
+			String token = httpServletRequest.getHeader("token");
+			String newPassword = httpServletRequest.getHeader("newPassword");
+			userServiceImpl.resetPassword(token, newPassword);
+			return ResponseEntity.ok("Password reset successfully.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@PutMapping("/reset-password")
+	public ResponseEntity<?> passwordReset(HttpServletRequest httpServletRequest) {
+		try {
+			String oldPassword = httpServletRequest.getHeader("oldPassword");
+			String newPassword = httpServletRequest.getHeader("newPassword");
+			userServiceImpl.userPasswordReset(oldPassword, newPassword);
+			return ResponseEntity.ok("Password reset successfully.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 }

@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.desi.kart.desikart_backend.domain.OtpVerification;
 
-public interface OtpRepository extends CrudRepository<OtpVerification, String>{
+public interface OtpRepository extends CrudRepository<OtpVerification, Long>{
 
     Optional<OtpVerification> findByUserIdAndOtpAndIsUsedFalse(Long userId, String otp);
 }

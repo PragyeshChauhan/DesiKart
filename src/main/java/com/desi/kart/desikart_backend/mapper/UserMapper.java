@@ -15,6 +15,7 @@ public class UserMapper {
 			return null;
 		}
 		BeanUtils.copyProperties(user, userDTO);
+		userDTO.setPassword(null);
 		return userDTO;
 	}
 	
@@ -27,5 +28,4 @@ public class UserMapper {
 		BeanUtils.copyProperties(userDTO, user);
 		return user;
 	}
-
 }

@@ -8,4 +8,7 @@ import com.desi.kart.desikart_backend.domain.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, String>{
 
+    User findByEmail(String token);
+
+    User findByPassword(String oldPassword);
 }
