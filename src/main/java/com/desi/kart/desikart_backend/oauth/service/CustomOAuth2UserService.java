@@ -1,5 +1,6 @@
-package com.desi.kart.desikart_backend.oauth;
+package com.desi.kart.desikart_backend.oauth.service;
 
+import com.desi.kart.desikart_backend.spring.config.CustomSpringUser;
 import com.desi.kart.desikart_backend.domain.BaseRoles;
 import com.desi.kart.desikart_backend.domain.User;
 import com.desi.kart.desikart_backend.notification.MailService;
@@ -12,7 +13,6 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,8 +33,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Autowired
     private MailService mailService;
 
-    @Autowired
-    private Logger log = LoggerFactory.getLogger(getClass());
+
+    private static  final  Logger log = LoggerFactory.getLogger(CustomOAuth2UserService.class);
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
@@ -48,9 +48,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> registerNewUser(email, name, provider));
+        CustomSpringUser springUser =  new CustomSpringUser(user);
 
         return new DefaultOAuth2User(
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")),
+                springUser.getAuthorities(),
                 attributes,
                 "email"
         );
@@ -76,15 +77,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setPassword(passwordEncoder.encode("defaultPassword"));
         user.setActive(true);
         user.setResetPasswordAfterLogin(true);
-
+        user.setVerified(true);
 
        Optional<BaseRoles> baseRoles = baseRolesRepo.findByIsDefaultTrue();
        if(baseRoles.isPresent()){
-           BaseRoles role =    baseRoles.get();
-           List<Long> roles =  new ArrayList<>();
-           roles.add(role.getId());
-
-           user.setRoleId(roles);
+           user.setRoles(Set.of(baseRoles.get()));
        }
        try {
            mailService.sendWelcomeMail(email,name,provider);

@@ -1,4 +1,4 @@
-package com.desi.kart.desikart_backend.configuration;
+package com.desi.kart.desikart_backend.spring.config;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

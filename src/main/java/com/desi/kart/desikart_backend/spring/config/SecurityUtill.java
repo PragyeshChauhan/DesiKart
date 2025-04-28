@@ -1,6 +1,7 @@
-package com.desi.kart.desikart_backend.configuration;
+package com.desi.kart.desikart_backend.spring.config;
 
-import com.desi.kart.desikart_backend.oauth.CustomOAuth2UserService;
+import com.desi.kart.desikart_backend.jwt.service.JwtAuthenticationFilter;
+import com.desi.kart.desikart_backend.oauth.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -22,6 +23,7 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityUtill {
 
+    private static final long CORS_MAX_AGE_SECONDS = 3600L;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
@@ -49,7 +51,7 @@ public class SecurityUtill {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
+        configuration.setMaxAge(CORS_MAX_AGE_SECONDS);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -71,8 +73,8 @@ public class SecurityUtill {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                        .defaultSuccessUrl("/api/oauth2/success", true)
-                        .failureUrl("/api/oauth2/failure")
+                        .defaultSuccessUrl("/userProfile", true)
+                        .failureUrl("/login?error=true")
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint)

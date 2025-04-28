@@ -1,17 +1,17 @@
 package com.desi.kart.desikart_backend.domain;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-public class BaseRoles {
+public class BaseRoles implements GrantedAuthority {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +20,14 @@ public class BaseRoles {
 	private String baseRole;
 
 	private boolean isDefault;
-	
+
+	private String roleType;
+
+	@ManyToMany(mappedBy = "roles")
+	private Set<User> users;
+
+	@Override
+	public String getAuthority() {
+		return roleType;
+	}
 }
