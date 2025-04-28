@@ -18,5 +18,7 @@ public class BaseRoles {
 	private Long id;
 	
 	private String baseRole;
+
+	private boolean isDefault;
 	
 }

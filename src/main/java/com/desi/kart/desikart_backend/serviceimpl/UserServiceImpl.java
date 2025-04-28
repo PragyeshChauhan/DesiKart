@@ -18,7 +18,6 @@ import com.desi.kart.desikart_backend.repository.OtpRepository;
 import com.desi.kart.desikart_backend.repository.UserRepository;
 import com.desi.kart.desikart_backend.service.UserService;
 import com.desi.kart.desikart_backend.utility.Utility;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaUpdate;
@@ -107,28 +106,25 @@ public class UserServiceImpl implements UserService{
 		if (passwordReset.getExpirationDate().isBefore(LocalDateTime.now())) {
 			throw new RuntimeException("Token has expired.");
 		}
-		User user = userRepository.findByEmail(passwordReset.getEmail());
-		if (user == null) {
+		Optional<User> user = userRepository.findByEmail(passwordReset.getEmail());
+		if (!user.isPresent()) {
 			throw new RuntimeException("User not found.");
 		}
-		user.setPassword(newPassword);  // Encode password securely
-		userRepository.save(user);
+		user.get().setPassword(newPassword);  // Encode password securely
+		userRepository.save(user.get());
 		passwordResetRepository.delete(passwordReset);
 	}
 
 	@Override
 	public void saveResetToken(String email,String token) {
-		User user = userRepository.findByEmail(email);
-		if (user == null) {
+		Optional<User> user = userRepository.findByEmail(email);
+		if (user.isPresent()) {
 			throw new RuntimeException("User not found with email: " + email);
 		}
-
-
 		LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(15);
 
 		// Create PasswordReset entry
-		PasswordReset passwordReset = new PasswordReset(user.getEmail(), token, expirationTime);
-
+		PasswordReset passwordReset = new PasswordReset(user.get().getEmail(), token, expirationTime);
 		passwordResetRepository.save(passwordReset);
 	}
 

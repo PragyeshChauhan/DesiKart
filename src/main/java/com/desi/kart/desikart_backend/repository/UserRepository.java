@@ -5,10 +5,12 @@ import org.springframework.stereotype.Repository;
 
 import com.desi.kart.desikart_backend.domain.User;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, String>{
 
-    User findByEmail(String token);
+    Optional <User> findByEmail(String token);
 
     User findByPassword(String oldPassword);
 }

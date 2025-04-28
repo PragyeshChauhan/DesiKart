@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Welcome Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .header h1 {
+            color: #333333;
+            font-size: 24px;
+            margin: 0;
+        }
+        .content {
+            padding: 20px;
+            color: #555555;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .content p {
+            margin: 0 0 15px;
+        }
+        .button {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .button a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            color: #999999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Welcome to Our Application!</h1>
+    </div>
+    <div class="content">
+        <p th:text="'Hello, ' + ${userName} + '!'">Hello, User!</p>
+        <p>Thank you for registering with us using <span th:text="${provider}">Provider</span>. Your account has been successfully created.</p>
+        <p>Your registered email is: <strong th:text="${email}">user@example.com</strong></p>
+        <p>We're excited to have you on board! Explore our features and let us know if you need any assistance.</p>
+        <div class="button">
+            <a href="https://desiKart.com" th:href="${appUrl}">Get Started</a>
+        </div>
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 Your Company. All rights reserved.</p>
+        <p>If you have any questions, contact us at <a href="mailto:desiKart@gmail.com">desiKart@gmail.com</a>.</p>
+    </div>
+</div>
+</body>
+</html>

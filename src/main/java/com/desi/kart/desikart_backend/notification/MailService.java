@@ -1,5 +1,6 @@
 package com.desi.kart.desikart_backend.notification;
 
+import com.desi.kart.desikart_backend.constants.SystemConstants;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -36,5 +37,21 @@ public class MailService {
             e.printStackTrace();
             throw new RuntimeException("Error processing the email", e);
         }
+    }
+
+    public void sendWelcomeMail( String to , String userName , String provider ) throws  Exception{
+
+        Context context = new Context();
+        context.setVariable("userName",userName);
+        context.setVariable("provider",provider);
+        context.setVariable("email",to);
+        String htmlContent =  templateEngine.process("userRegistrationTemplate",context);
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message , true , "UTF-8");
+        helper.setTo(to);
+        helper.setFrom(SystemConstants.systeMail);
+        helper.setSubject("Welcome To -->  desiKart ! ");
+        helper.setText(htmlContent ,true);
+        mailSender.send(message);
     }
 }

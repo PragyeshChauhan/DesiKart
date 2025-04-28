@@ -14,12 +14,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserRole {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	private String userId;
-	
-	private List<String> roleId;
+//
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
+//	private Long id;
+//
+//	private Long userId;
+//
+//	private List<String> roleId;
 }

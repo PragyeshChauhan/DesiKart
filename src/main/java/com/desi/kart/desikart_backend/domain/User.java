@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -36,4 +36,10 @@ public class User {
 	private boolean isActive;
 	
 	private String deviceToken;
+
+	private String provider ;
+
+	private boolean  resetPasswordAfterLogin ;
+
+	private List<Long> roleId;
 }
