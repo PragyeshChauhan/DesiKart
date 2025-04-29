@@ -2,11 +2,17 @@ package com.desi.kart.desikart_backend.serviceimpl;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
+import com.desi.kart.desikart_backend.domain.BaseRoles;
 import com.desi.kart.desikart_backend.domain.PasswordReset;
+import com.desi.kart.desikart_backend.notification.MailService;
+import com.desi.kart.desikart_backend.repository.BaseRolesRepo;
 import com.desi.kart.desikart_backend.repository.PasswordResetRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.desi.kart.desikart_backend.domain.OtpVerification;
@@ -26,24 +32,35 @@ import jakarta.persistence.criteria.Root;
 @Service
 public class UserServiceImpl implements UserService{
 
-//	private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	private final EntityManager entityManager;
 
-	private final UserMapper userMapper;
-    private final UserRepository userRepository;
-    private final EntityManager entityManager;
-	private final PasswordResetRepository passwordResetRepository;
+    @Autowired
+	private  UserMapper userMapper;
 
+	@Autowired
+    private  UserRepository userRepository;
+
+	private  PasswordResetRepository passwordResetRepository;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private BaseRolesRepo baseRolesRepo;
+
+	@Autowired
+	private MailService mailService;
+
+	@Autowired
     private NotificationService pushService;
+
+	@Autowired
     private OtpRepository otpRepo;
+
 	private Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     
-    public UserServiceImpl(UserMapper userMapper, UserRepository userRepository,EntityManager entityManager,OtpRepository otpRepo,NotificationService pushService,PasswordResetRepository passwordResetRepository) {
-        this.userMapper = userMapper;
-        this.userRepository = userRepository;
+    public UserServiceImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
-		this.pushService =pushService;
-        this.otpRepo = otpRepo;
-		this.passwordResetRepository = passwordResetRepository;
     }
 
 	@Override
@@ -107,7 +124,7 @@ public class UserServiceImpl implements UserService{
 			throw new RuntimeException("Token has expired.");
 		}
 		Optional<User> user = userRepository.findByEmail(passwordReset.getEmail());
-		if (!user.isPresent()) {
+		if (user.isEmpty()) {
 			throw new RuntimeException("User not found.");
 		}
 		user.get().setPassword(newPassword);  // Encode password securely
@@ -126,6 +143,8 @@ public class UserServiceImpl implements UserService{
 		// Create PasswordReset entry
 		PasswordReset passwordReset = new PasswordReset(user.get().getEmail(), token, expirationTime);
 		passwordResetRepository.save(passwordReset);
+		String resetLink = "https://desikart.com/reset-password?token=" + token;
+		mailService.sendResetPasswordEmail(email, resetLink);
 	}
 
 	@Override
@@ -138,5 +157,25 @@ public class UserServiceImpl implements UserService{
 			throw new RuntimeException("user not found");
 		}
 		user.setPassword(newPassword);
+	}
+
+	public User registerNewUser(String email, String name, String provider) {
+		User user = new User();
+		user.setEmail(email);
+		user.setName(name);
+		user.setProvider(provider);
+		user.setPassword(passwordEncoder.encode("defaultPassword"));
+		user.setActive(true);
+		user.setResetPasswordAfterLogin(true);
+		user.setVerified(true);
+
+		Optional<BaseRoles> baseRoles = baseRolesRepo.findByIsDefaultTrue();
+		baseRoles.ifPresent(roles -> user.setRoles(Set.of(roles)));
+		try {
+			mailService.sendWelcomeMail(email,name,provider);
+		} catch (Exception e) {
+			log.error("welcome mail hasn't send");
+		}
+		return userRepository.save(user);
 	}
 }

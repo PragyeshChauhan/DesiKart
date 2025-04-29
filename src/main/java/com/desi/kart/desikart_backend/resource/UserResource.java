@@ -2,6 +2,7 @@ package com.desi.kart.desikart_backend.resource;
 
 import com.desi.kart.desikart_backend.notification.MailService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +15,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/user")
 public class UserResource {
-	
-	private final UserServiceImpl userServiceImpl;
-	private final MailService mailService;
+	@Autowired
+	private  UserServiceImpl userServiceImpl;
+
+
 		
-	public UserResource(UserServiceImpl userServiceImpl,MailService mailService) {
-		this.mailService = mailService;
-		this.userServiceImpl = userServiceImpl;
-	}
+
 
 	@PostMapping
 	public ResponseEntity<?> saveUser(@RequestBody UserDTO userDTO){
@@ -47,8 +46,7 @@ public class UserResource {
 	public ResponseEntity<?> sendResetEmail(@RequestParam String email) {
 		String token = UUID.randomUUID().toString();
 		userServiceImpl.saveResetToken(email,token);
-		String resetLink = "https://desikart.com/reset-password?token=" + token;
-		mailService.sendResetPasswordEmail(email, resetLink);
+
 		return ResponseEntity.ok("Reset email sent");
 	}
 
