@@ -1,5 +1,6 @@
 package com.desi.kart.desikart_backend.oauth.service;
 
+import com.desi.kart.desikart_backend.serviceimpl.UserServiceImpl;
 import com.desi.kart.desikart_backend.spring.config.CustomSpringUser;
 import com.desi.kart.desikart_backend.domain.BaseRoles;
 import com.desi.kart.desikart_backend.domain.User;
@@ -25,9 +26,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private BaseRolesRepo baseRolesRepo;
 
     @Autowired
@@ -38,7 +36,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
-        // Delegate to default implementation to fetch user info from OAuth2 provider
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
@@ -69,25 +66,25 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         };
     }
 
-    private User registerNewUser(String email, String name, String provider) {
+
+    public User registerNewUser(String email, String name, String provider) {
         User user = new User();
         user.setEmail(email);
         user.setName(name);
         user.setProvider(provider);
-        user.setPassword(passwordEncoder.encode("defaultPassword"));
+        user.setPassword("Welcome@01");
         user.setActive(true);
         user.setResetPasswordAfterLogin(true);
         user.setVerified(true);
 
-       Optional<BaseRoles> baseRoles = baseRolesRepo.findByIsDefaultTrue();
-       if(baseRoles.isPresent()){
-           user.setRoles(Set.of(baseRoles.get()));
-       }
-       try {
-           mailService.sendWelcomeMail(email,name,provider);
-       } catch (Exception e) {
-         log.error("welcome mail hasn't send");
-       }
-     return userRepository.save(user);
+        Optional<BaseRoles> baseRoles = baseRolesRepo.findByIsDefaultTrue();
+        baseRoles.ifPresent(roles -> user.setRoles(Set.of(roles)));
+        try {
+            mailService.sendWelcomeMail(email,name,provider);
+        } catch (Exception e) {
+            log.error("welcome mail hasn't send");
+        }
+        return userRepository.save(user);
     }
+
 }

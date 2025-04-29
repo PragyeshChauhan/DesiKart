@@ -16,30 +16,31 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
-/**
- * A filter that processes JWT authentication for incoming HTTP requests.
- * It extracts and validates the JWT token from the Authorization header,
- * authenticates the user, and sets the authentication in the SecurityContext.
- */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     private static final String BEARER_PREFIX = "Bearer ";
-
     private final JwtTokenService jwtTokenUtils;
     private final CustomUserDetailsService userDetailsService;
-
+    private final List<String> excludedPaths = List.of("/favicon.ico", "/api/auth/", "/oauth2/", "/h2-console/");
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     public JwtAuthenticationFilter(JwtTokenService jwtTokenUtils, CustomUserDetailsService userDetailsService) {
         this.jwtTokenUtils = jwtTokenUtils;
         this.userDetailsService = userDetailsService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        String path = request.getRequestURI();
+
+        if (excludedPaths.stream().anyMatch(path::startsWith)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             String jwtToken = parseToken(request);
             if (jwtToken != null && jwtTokenUtils.validateToken(jwtToken)) {
@@ -58,12 +59,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    /**
-     * Extracts the JWT token from the Authorization header.
-     *
-     * @param request the HTTP request
-     * @return the JWT token, or null if not present or invalid
-     */
     private String parseToken(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER_PREFIX)) {
