@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.checkerframework.common.aliasing.qual.Unique;
 
 import java.util.Set;
 
@@ -25,6 +26,7 @@ public class User {
 
 	@NotBlank(message = "User Name is required")
 	@Column(nullable = false)
+	@Unique
 	private String username;
 
 	@NotBlank(message = "Email is required")
@@ -34,6 +36,10 @@ public class User {
 	@NotBlank(message = "Phone is required")
 	@Column(nullable = false)
 	private String phone;
+
+	@NotBlank(message = "Phone is required")
+	@Column(nullable = false)
+	private String phoneCountryCode;
 
 	@NotBlank(message = "Password is required")
 	@Column(nullable = false)

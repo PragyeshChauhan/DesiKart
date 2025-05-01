@@ -68,18 +68,19 @@ public class UserServiceImpl implements UserService{
 		if(userDTO==null) {
 			return null;
 		}
-//		String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
-//		userDTO.setPassword(encodedPassword);
+		String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
+		userDTO.setPassword(encodedPassword);
 		User user = userMapper.toDomain(userDTO);
-		String otp = Utility.generateOtp();
-	    OtpVerification otpVerification = new OtpVerification(user.getId(), otp, LocalDateTime.now(), false);
-	    otpRepo.save(otpVerification);
-        try {
-            pushService.sendOtp(user.getDeviceToken(), otp);
-        } catch (Exception e) {
-			log.info("error whiling otp verification");
-        }
+
         User use = userRepository.save(user);
+		String otp = Utility.generateOtp();
+		OtpVerification otpVerification = new OtpVerification(user.getId(), otp, LocalDateTime.now(), false);
+		otpRepo.save(otpVerification);
+		try {
+			pushService.sendOtp(user.getDeviceToken(), otp);
+		} catch (Exception e) {
+			log.info("error whiling otp verification");
+		}
 		return userMapper.toDTO(use);
 	}
 

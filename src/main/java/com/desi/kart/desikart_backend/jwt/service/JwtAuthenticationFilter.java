@@ -24,7 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
     private final JwtTokenService jwtTokenUtils;
     private final CustomUserDetailsService userDetailsService;
-    private final List<String> excludedPaths = List.of("/favicon.ico", "/api/auth/", "/oauth2/", "/h2-console/");
+    private final List<String> excludedPaths = List.of("/favicon.ico", "/api/auth/", "/oauth2/", "/h2-console/" ,"/api/user/register");
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     public JwtAuthenticationFilter(JwtTokenService jwtTokenUtils, CustomUserDetailsService userDetailsService) {
         this.jwtTokenUtils = jwtTokenUtils;

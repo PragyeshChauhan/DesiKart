@@ -18,7 +18,7 @@ public class UserResource {
 	@Autowired
 	private  UserServiceImpl userServiceImpl;
 
-	@PostMapping
+	@PostMapping("/register")
 	public ResponseEntity<?> saveUser(@RequestBody UserDTO userDTO){
 		return new ResponseEntity<>(userServiceImpl.createUser(userDTO), HttpStatus.OK);
 	}

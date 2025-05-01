@@ -4,6 +4,8 @@ import com.desi.kart.desikart_backend.jwt.service.JwtAuthenticationFilter;
 import com.desi.kart.desikart_backend.oauth.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -48,6 +50,11 @@ public class SecurityUtill {
     }
 
     @Bean
+    public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("https://desiKart.com", "http://localhost:9090"));
@@ -77,7 +84,7 @@ public class SecurityUtill {
                         .requestMatchers("/api/auth/**", "/oauth2/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll() // Removed /favicon.ico
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/user/register").permitAll()
                         .anyRequest().authenticated()
                 )
                 .headers(headers ->

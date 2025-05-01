@@ -1,13 +1,16 @@
 package com.desi.kart.desikart_backend.spring.config;
 import com.desi.kart.desikart_backend.domain.User;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
-
+@Data
 public class CustomSpringUser implements UserDetails {
 
     private User user;
+
+    private String ZoneId;
 
     public CustomSpringUser( User user){
         this.user = user;
@@ -47,4 +50,5 @@ public class CustomSpringUser implements UserDetails {
     public boolean isEnabled() {
         return user.isActive();
     }
+
 }

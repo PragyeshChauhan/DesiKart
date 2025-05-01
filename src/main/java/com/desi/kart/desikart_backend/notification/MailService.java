@@ -1,6 +1,7 @@
 package com.desi.kart.desikart_backend.notification;
 
 import com.desi.kart.desikart_backend.constants.SystemConstants;
+import com.fasterxml.jackson.databind.ser.impl.MapEntrySerializer;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -9,6 +10,10 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import jakarta.mail.internet.MimeMessage;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class MailService {
@@ -49,8 +54,23 @@ public class MailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message , true , "UTF-8");
         helper.setTo(to);
-        helper.setFrom(SystemConstants.systeMail);
+        helper.setFrom(SystemConstants.systemMail);
         helper.setSubject("Welcome To -->  desiKart ! ");
+        helper.setText(htmlContent ,true);
+        mailSender.send(message);
+    }
+
+    public void sendMail(String to , Map<String ,String> contexts , String subject , String templateId ) throws  Exception{
+        Context context = new Context();
+        for (Map.Entry<String,String> contextObj :contexts.entrySet()) {
+            context.setVariable(contextObj.getKey(),contextObj.getValue());
+        }
+        String htmlContent =  templateEngine.process(templateId,context);
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message , true , "UTF-8");
+        helper.setTo(to);
+        helper.setFrom(SystemConstants.systemMail);
+        helper.setSubject(subject);
         helper.setText(htmlContent ,true);
         mailSender.send(message);
     }

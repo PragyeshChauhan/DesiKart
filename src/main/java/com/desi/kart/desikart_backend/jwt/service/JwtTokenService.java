@@ -1,5 +1,6 @@
 package com.desi.kart.desikart_backend.jwt.service;
 
+import com.desi.kart.desikart_backend.spring.config.CustomSpringUser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
@@ -37,13 +38,17 @@ public class JwtTokenService {
      * @param userDetails the user details to include in the token
      * @return the generated JWT token
      */
-    public String generateJwtToken(UserDetails userDetails) {
+    public String generateJwtToken(CustomSpringUser userDetails) {
         Set<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("roles", roles)
+                .claim("userFullName", userDetails.getUser().getName())
+                .claim("userId", userDetails.getUser().getId())
+                .claim("email", userDetails.getUser().getEmail())
+                .claim("userZone", userDetails.getZoneId())
                 .setIssuer(ISSUER)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))

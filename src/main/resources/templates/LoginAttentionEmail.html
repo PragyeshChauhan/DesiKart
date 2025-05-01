@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Login Attention</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .header h1 {
+            color: #333333;
+            font-size: 24px;
+            margin: 0;
+        }
+        .content {
+            padding: 20px;
+            color: #555555;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .content p {
+            margin: 0 0 15px;
+        }
+        .alert {
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 5px;
+            color: #c62828;
+            font-weight: bold;
+        }
+        .button {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .button a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #d32f2f;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            color: #999999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Login Attempt Notification</h1>
+    </div>
+    <div class="content">
+        <p th:text="'Hello, ' + ${userName} + '!'">Hello, User!</p>
+        <p class="alert">We detected a login attempt to your account.</p>
+        <p>Details of the login attempt:</p>
+        <ul>
+            <li><strong>Email:</strong> <span th:text="${email}">user@example.com</span></li>
+            <li><strong>Time:</strong> <span th:text="${loginTime}">2025-04-30 12:00:00</span> <span th:text="'(' + ${zoneId} + ')'">UTC</span></li>
+            <li><strong>Location:</strong> <span th:text="${location}">Unknown</span></li>
+            <li><strong>Device:</strong> <span th:text="${device}">Unknown</span></li>
+        </ul>
+        <p>If this was you, you can safely ignore this email. If you did not initiate this login, please secure your account immediately.</p>
+        <div class="button">
+            <a th:href="${secureAccountUrl}" href="https://desiKart.com/secure-account">Secure Your Account</a>
+        </div>
+        <p>For additional support, please contact our team.</p>
+    </div>
+    <div class="footer">
+        <p>© 2025 DesiKart. All rights reserved.</p>
+        <p>Contact us at <a href="mailto:desiKart@gmail.com">desiKart@gmail.com</a> if you have any questions.</p>
+    </div>
+</div>
+</body>
+</html>
