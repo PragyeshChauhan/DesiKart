@@ -72,6 +72,7 @@ public class UserServiceImpl implements UserService{
 		userDTO.setPassword(encodedPassword);
 		User user = userMapper.toDomain(userDTO);
 
+
         User use = userRepository.save(user);
 		String otp = Utility.generateOtp();
 		OtpVerification otpVerification = new OtpVerification(user.getId(), otp, LocalDateTime.now(), false);
